@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Helpdesk Chatbot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+  <!-- <link rel="stylesheet" href="style.css"> -->
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div id="app-wrapper" class="app-wrapper">
+   <div class="main-container"><!-- Sidebar -->
+    <aside class="sidebar">
+     <div class="sidebar-header">
+      <div class="logo-circle">
+       <svg class="logo-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+       </svg>
+      </div>
+      <div class="logo-text">
+       <h1 id="company-name">TechCorp IT</h1>
+       <p>Helpdesk Portal</p>
+      </div>
+     </div><!-- Quick Actions -->
+     <div class="quick-actions-section">
+      <h3>Quick Actions</h3>
+      <div class="quick-actions-grid"><button class="quick-action-btn" onclick="handleQuickAction('password')"> <span class="quick-action-icon">🔐</span> <span>Password Reset</span> </button> <button class="quick-action-btn" onclick="handleQuickAction('internet')"> <span class="quick-action-icon">🌐</span> <span>Internet Issues</span> </button> <button class="quick-action-btn" onclick="handleQuickAction('software')"> <span class="quick-action-icon">💻</span> <span>Software Error</span> </button> <button class="quick-action-btn" onclick="handleQuickAction('login')"> <span class="quick-action-icon">🔑</span> <span>Login Problems</span> </button>
+      </div>
+     </div><!-- Stats -->
+     <div class="stats-box">
+      <h3>Your Tickets</h3>
+      <div class="stats-grid">
+       <div class="stat-item">
+        <div id="open-tickets" class="stat-number">
+         0
+        </div>
+        <div class="stat-label">
+         Open
+        </div>
+       </div>
+       <div class="stat-item">
+        <div id="pending-tickets" class="stat-number">
+         0
+        </div>
+        <div class="stat-label">
+         Pending
+        </div>
+       </div>
+       <div class="stat-item">
+        <div id="resolved-tickets" class="stat-number">
+         0
+        </div>
+        <div class="stat-label">
+         Resolved
+        </div>
+       </div>
+      </div>
+     </div>
+    </aside><!-- Main Chat Area -->
+    <main class="main-chat"><!-- Chat Header -->
+     <header class="chat-header">
+      <div class="header-left">
+       <div class="bot-avatar"><span class="bot-emoji">🤖</span>
+        <div class="online-indicator"></div>
+       </div>
+       <div class="bot-info">
+        <h2 id="bot-name">Alex</h2>
+        <p class="online-status"><span class="status-dot"></span> Online • Ready to help</p>
+       </div>
+      </div><button class="view-tickets-btn" onclick="showTicketsModal()">
+       <svg class="btn-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+       </svg> View Tickets </button>
+     </header><!-- Chat Messages -->
+     <div id="chat-container" class="chat-container"><!-- Messages will be inserted here -->
+     </div><!-- Chat Input -->
+     <div class="chat-input-section">
+      <form id="chat-form" class="chat-form"><input type="text" id="chat-input" placeholder="Describe your IT issue..." class="chat-input-field"> <button type="submit" class="send-button"> <span>Send</span>
+        <svg class="send-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+        </svg></button>
+      </form>
+     </div>
+    </main>
+   </div>
+  </div><!-- Tickets Modal -->
+  <div id="tickets-modal" class="modal hidden">
+   <div class="modal-backdrop" onclick="hideTicketsModal()"></div>
+   <div class="modal-content">
+    <div class="modal-header">
+     <h3>Support Tickets</h3><button class="modal-close" onclick="hideTicketsModal()">
+      <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg></button>
+    </div>
+    <div id="tickets-list" class="tickets-list"><!-- Tickets will be inserted here -->
+    </div>
+   </div>
+  </div><!-- Create Ticket Modal -->
+  <div id="create-ticket-modal" class="modal hidden">
+   <div class="modal-backdrop" onclick="hideCreateTicketModal()"></div>
+   <div class="modal-content modal-small">
+    <div class="modal-header">
+     <div>
+      <h3>Create Support Ticket</h3>
+      <p class="modal-subtitle">Escalate to human IT support</p>
+     </div><button class="modal-close" onclick="hideCreateTicketModal()">
+      <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg></button>
+    </div>
+    <form id="ticket-form" class="ticket-form">
+     <div class="form-group"><label for="ticket-type">Issue Type</label> <select id="ticket-type" class="form-select"> <option value="password">Password Reset</option> <option value="internet">Internet Issue</option> <option value="software">Software Error</option> <option value="login">Login Problem</option> <option value="hardware">Hardware Issue</option> <option value="other">Other</option> </select>
+     </div>
+     <div class="form-group"><label for="ticket-desc">Description</label> <textarea id="ticket-desc" rows="3" placeholder="Describe your issue in detail..." class="form-textarea"></textarea>
+     </div>
+     <div class="form-group"><label>Priority</label>
+      <div class="priority-buttons"><button type="button" class="priority-btn low" onclick="setPriority('low')" id="priority-low">Low</button> <button type="button" class="priority-btn medium" onclick="setPriority('medium')" id="priority-medium">Medium</button> <button type="button" class="priority-btn high" onclick="setPriority('high')" id="priority-high">High</button>
+      </div>
+     </div>
+     <div class="form-buttons"><button type="button" class="btn-cancel" onclick="hideCreateTicketModal()">Cancel</button> <button type="submit" class="btn-submit" id="submit-ticket-btn">Create Ticket</button>
+     </div>
+    </form>
+   </div>
+  </div>
+  <script src="script.js"></script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c9c6b8846cf493a',t:'MTc3MDM5OTQ5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>      
